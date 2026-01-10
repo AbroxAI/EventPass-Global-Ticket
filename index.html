@@ -4,56 +4,86 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EventPass Global | Premium Ticket Marketplace</title>
+    <meta name="description" content="Secure premium event tickets with instant mobile delivery. Official ticket marketplace.">
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="icon" type="image/x-icon" href="assets/icons/favicon.ico">
 </head>
 <body>
     <!-- Header -->
     <header class="header">
-        <nav class="navbar">
-            <div class="logo">
-                <h1 class="logo-text">EventPass</h1>
-                <span class="logo-subtext">Global</span>
-            </div>
+        <div class="header-container">
+            <nav class="navbar">
+                <!-- Logo -->
+                <div class="logo">
+                    <div class="logo-main">
+                        <span class="logo-eventpass">EventPass</span>
+                        <span class="logo-global">Global</span>
+                    </div>
+                </div>
+                
+                <!-- Navigation -->
+                <ul class="nav-menu">
+                    <li><a href="#" class="nav-link active">Home</a></li>
+                    <li><a href="#events" class="nav-link">Events</a></li>
+                    <li><a href="#how-it-works" class="nav-link">How It Works</a></li>
+                    <li><a href="#support" class="nav-link">Support</a></li>
+                </ul>
+            </nav>
             
-            <ul class="nav-menu">
-                <li><a href="#" class="nav-link active">Home</a></li>
-                <li><a href="#" class="nav-link">Events</a></li>
-                <li><a href="#" class="nav-link">How It Works</a></li>
-                <li><a href="#" class="nav-link">Support</a></li>
-            </ul>
-            
-            <div class="trust-badges">
-                <span class="badge"><i class="fas fa-shield-alt"></i> PCI-DSS Compliant</span>
-                <span class="badge"><i class="fas fa-check-circle"></i> Buyer Guarantee</span>
-                <span class="badge"><i class="fas fa-star"></i> 4.9/5 (2.1k Reviews)</span>
+            <!-- Trust Badges (Below Nav) -->
+            <div class="trust-badges-container">
+                <div class="trust-badge">
+                    <span class="badge-icon">🔒</span>
+                    <span class="badge-text">PCI-DSS Compliant</span>
+                </div>
+                <div class="trust-badge">
+                    <span class="badge-icon">✓</span>
+                    <span class="badge-text">Buyer Guarantee</span>
+                </div>
+                <div class="trust-badge">
+                    <span class="badge-icon">⭐</span>
+                    <span class="badge-text">4.9/5 (2.1k Reviews)</span>
+                </div>
             </div>
-        </nav>
+        </div>
     </header>
 
     <!-- Hero Section -->
     <section class="hero">
-        <div class="hero-overlay">
+        <div class="hero-background">
+            <div class="hero-gradient"></div>
+        </div>
+        
+        <div class="hero-container">
             <div class="hero-content">
-                <div class="hero-text">
-                    <h2 class="hero-headline">Final Release: <span class="artist">Taylor Swift</span> - <span class="city">London</span></h2>
+                <!-- Headline -->
+                <div class="hero-headline">
+                    <h1>Final Release: <span class="artist-highlight">Taylor Swift</span> - <span class="city-highlight">London</span></h1>
                     <p class="hero-subtitle">Limited tickets recovered from held inventory.</p>
                 </div>
                 
+                <!-- Urgency Module -->
                 <div class="urgency-module">
-                    <div class="countdown-timer">
-                        <div class="timer-display">
-                            <span id="minutes">06</span>:<span id="seconds">41</span>
+                    <!-- Circular Countdown Timer -->
+                    <div class="countdown-container">
+                        <div class="countdown-circle">
+                            <div class="countdown-timer" id="countdownTimer">
+                                <span class="minutes" id="minutes">06</span>
+                                <span class="colon">:</span>
+                                <span class="seconds" id="seconds">41</span>
+                            </div>
                         </div>
-                        <p class="timer-label">Only 2 tickets remain at this price</p>
+                        <p class="countdown-text">Only 2 tickets remain at this price</p>
                     </div>
                     
-                    <a href="checkout.html" class="cta-button pulse">
-                        <i class="fas fa-ticket-alt"></i> BUY NOW
+                    <!-- Pulsing BUY NOW Button -->
+                    <a href="checkout.html" class="buy-now-btn pulse-animation">
+                        <span class="btn-icon">🎫</span>
+                        <span class="btn-text">BUY NOW</span>
                     </a>
                 </div>
             </div>
@@ -61,116 +91,217 @@
     </section>
 
     <!-- Main Content -->
-    <main class="container">
+    <main class="main-container">
         <!-- Ticket Selection Module -->
-        <section class="ticket-section">
+        <section class="ticket-section" id="events">
             <h2 class="section-title">Available Tickets</h2>
             
-            <div class="ticket-card premium">
-                <div class="ticket-header">
-                    <span class="premium-badge">
-                        <i class="fas fa-star"></i> PREMIUM SEATS
-                    </span>
-                    <span class="ticket-status">Mobile Entry</span>
+            <!-- Premium Ticket Card -->
+            <div class="ticket-card premium-card">
+                <div class="card-header">
+                    <div class="premium-badge">
+                        <span class="badge-star">⭐</span>
+                        <span class="badge-text">PREMIUM SEATS</span>
+                    </div>
+                    <div class="entry-type">
+                        <span class="entry-icon">📱</span>
+                        <span class="entry-text">Mobile Entry</span>
+                    </div>
                 </div>
                 
-                <div class="ticket-details">
-                    <div class="seat-info">
-                        <h3 class="seat-section">Floor</h3>
-                        <div class="seat-specifics">
-                            <span class="seat-row">Row: <strong>B</strong></span>
-                            <span class="seat-numbers">Seats: <strong>102, 103</strong></span>
+                <div class="card-body">
+                    <div class="seat-details">
+                        <div class="seat-info">
+                            <div class="info-item">
+                                <span class="info-label">Section:</span>
+                                <span class="info-value">Floor</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Row:</span>
+                                <span class="info-value bold">B</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Seats:</span>
+                                <span class="info-value bold">102, 103</span>
+                            </div>
                         </div>
-                        <p class="delivery-info">
-                            <i class="fas fa-mobile-alt"></i> Mobile Entry - Transfer within 15 min of purchase
-                        </p>
+                        
+                        <div class="delivery-info">
+                            <span class="delivery-icon">⚡</span>
+                            <span class="delivery-text">Transfer within 15 min of purchase</span>
+                        </div>
                     </div>
                     
-                    <div class="ticket-pricing">
-                        <p class="price">$489.99 <span class="price-tax">each (incl. fees)</span></p>
-                        <a href="checkout.html?ticket=premium" class="select-button">
-                            SELECT TICKETS <i class="fas fa-arrow-right"></i>
-                        </a>
+                    <div class="price-action">
+                        <div class="price-container">
+                            <span class="price-currency">$</span>
+                            <span class="price-amount">489</span>
+                            <span class="price-decimal">.99</span>
+                            <div class="price-note">each (including all fees)</div>
+                        </div>
+                        
+                        <button class="select-btn" data-ticket="premium">
+                            SELECT TICKETS
+                            <span class="btn-arrow">→</span>
+                        </button>
                     </div>
                 </div>
             </div>
             
+            <!-- Regular Ticket Card -->
             <div class="ticket-card">
-                <div class="ticket-header">
-                    <span class="ticket-status">Mobile Entry</span>
+                <div class="card-header">
+                    <div class="entry-type">
+                        <span class="entry-icon">📱</span>
+                        <span class="entry-text">Mobile Entry</span>
+                    </div>
                 </div>
                 
-                <div class="ticket-details">
-                    <div class="seat-info">
-                        <h3 class="seat-section">Lower Bowl</h3>
-                        <div class="seat-specifics">
-                            <span class="seat-row">Row: <strong>M</strong></span>
-                            <span class="seat-numbers">Seats: <strong>45, 46</strong></span>
+                <div class="card-body">
+                    <div class="seat-details">
+                        <div class="seat-info">
+                            <div class="info-item">
+                                <span class="info-label">Section:</span>
+                                <span class="info-value">Lower Bowl</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Row:</span>
+                                <span class="info-value bold">M</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Seats:</span>
+                                <span class="info-value bold">45, 46</span>
+                            </div>
                         </div>
-                        <p class="delivery-info">
-                            <i class="fas fa-mobile-alt"></i> Mobile Entry - Transfer within 15 min of purchase
-                        </p>
+                        
+                        <div class="delivery-info">
+                            <span class="delivery-icon">⚡</span>
+                            <span class="delivery-text">Transfer within 15 min of purchase</span>
+                        </div>
                     </div>
                     
-                    <div class="ticket-pricing">
-                        <p class="price">$349.99 <span class="price-tax">each (incl. fees)</span></p>
-                        <a href="checkout.html?ticket=lowerbowl" class="select-button">
-                            SELECT TICKETS <i class="fas fa-arrow-right"></i>
-                        </a>
+                    <div class="price-action">
+                        <div class="price-container">
+                            <span class="price-currency">$</span>
+                            <span class="price-amount">349</span>
+                            <span class="price-decimal">.99</span>
+                            <div class="price-note">each (including all fees)</div>
+                        </div>
+                        
+                        <button class="select-btn" data-ticket="standard">
+                            SELECT TICKETS
+                            <span class="btn-arrow">→</span>
+                        </button>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- Trust & Social Proof -->
+        <!-- Trust & Social Proof Block -->
         <section class="trust-section">
-            <div class="stats-bar">
+            <!-- Stat Bar -->
+            <div class="stat-bar">
                 <div class="stat-item">
-                    <i class="fas fa-shield"></i>
-                    <span>12,847 Tickets Secured This Year</span>
+                    <span class="stat-icon">🛡️</span>
+                    <span class="stat-number">12,847</span>
+                    <span class="stat-text">Tickets Secured This Year</span>
                 </div>
+                <div class="stat-divider"></div>
                 <div class="stat-item">
-                    <i class="fas fa-handshake"></i>
-                    <span>99.2% Customer Satisfaction</span>
+                    <span class="stat-icon">🤝</span>
+                    <span class="stat-number">99.2%</span>
+                    <span class="stat-text">Customer Satisfaction</span>
                 </div>
             </div>
             
-            <div class="testimonial-carousel">
-                <div class="carousel-track">
-                    <div class="testimonial">
+            <!-- Testimonial Carousel -->
+            <div class="carousel-container">
+                <div class="carousel-track" id="testimonialCarousel">
+                    <!-- Testimonial 1 -->
+                    <div class="testimonial-card">
                         <div class="testimonial-content">
-                            <p>"Flawless transfer. Got my Taylor Swift tickets in under 5 minutes. Lifesaver!"</p>
-                            <div class="testimonial-author">
-                                <img src="assets/images/avatars/avatar1.jpg" alt="Sarah T." class="avatar">
+                            <div class="quote-bubble">
+                                <p class="quote-text">"Flawless transfer. Got my Taylor Swift tickets in under 5 minutes. Lifesaver!"</p>
+                            </div>
+                            <div class="quote-author">
+                                <div class="author-avatar">
+                                    <img src="https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face" alt="Sarah T.">
+                                </div>
                                 <div class="author-info">
-                                    <strong>Sarah T.</strong>
-                                    <span>Chicago (May 2024)</span>
+                                    <span class="author-name">Sarah T.</span>
+                                    <span class="author-location">Chicago (May 2024)</span>
                                 </div>
                             </div>
                         </div>
                     </div>
                     
-                    <div class="testimonial">
+                    <!-- Testimonial 2 -->
+                    <div class="testimonial-card">
                         <div class="testimonial-content">
-                            <p>"Secure platform and excellent customer support. Will definitely use again for future events."</p>
-                            <div class="testimonial-author">
-                                <img src="assets/images/avatars/avatar2.jpg" alt="James L." class="avatar">
+                            <div class="quote-bubble">
+                                <p class="quote-text">"Secure platform and excellent customer support. Will definitely use again for future events."</p>
+                            </div>
+                            <div class="quote-author">
+                                <div class="author-avatar">
+                                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face" alt="James L.">
+                                </div>
                                 <div class="author-info">
-                                    <strong>James L.</strong>
-                                    <span>Manchester (April 2024)</span>
+                                    <span class="author-name">James L.</span>
+                                    <span class="author-location">Manchester (April 2024)</span>
                                 </div>
                             </div>
                         </div>
                     </div>
                     
-                    <div class="testimonial">
+                    <!-- Testimonial 3 -->
+                    <div class="testimonial-card">
                         <div class="testimonial-content">
-                            <p>"Premium tickets at face value. The verification process gave me peace of mind."</p>
-                            <div class="testimonial-author">
-                                <img src="assets/images/avatars/avatar3.jpg" alt="Maria G." class="avatar">
+                            <div class="quote-bubble">
+                                <p class="quote-text">"Premium tickets at face value. The verification process gave me peace of mind."</p>
+                            </div>
+                            <div class="quote-author">
+                                <div class="author-avatar">
+                                    <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop&crop=face" alt="Maria G.">
+                                </div>
                                 <div class="author-info">
-                                    <strong>Maria G.</strong>
-                                    <span>New York (June 2024)</span>
+                                    <span class="author-name">Maria G.</span>
+                                    <span class="author-location">New York (June 2024)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Testimonial 4 -->
+                    <div class="testimonial-card">
+                        <div class="testimonial-content">
+                            <div class="quote-bubble">
+                                <p class="quote-text">"Quick delivery and exactly as described. Saved me from last-minute panic buying!"</p>
+                            </div>
+                            <div class="quote-author">
+                                <div class="author-avatar">
+                                    <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&h=100&fit=crop&crop=face" alt="Emma K.">
+                                </div>
+                                <div class="author-info">
+                                    <span class="author-name">Emma K.</span>
+                                    <span class="author-location">Sydney (July 2024)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Testimonial 5 -->
+                    <div class="testimonial-card">
+                        <div class="testimonial-content">
+                            <div class="quote-bubble">
+                                <p class="quote-text">"Professional service from start to finish. Tickets were in my account within minutes."</p>
+                            </div>
+                            <div class="quote-author">
+                                <div class="author-avatar">
+                                    <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face" alt="David R.">
+                                </div>
+                                <div class="author-info">
+                                    <span class="author-name">David R.</span>
+                                    <span class="author-location">Toronto (August 2024)</span>
                                 </div>
                             </div>
                         </div>
@@ -179,78 +310,119 @@
             </div>
         </section>
 
-        <!-- How It Works -->
-        <section class="how-it-works">
+        <!-- How It Works Block -->
+        <section class="how-it-works" id="how-it-works">
             <h2 class="section-title">How It Works</h2>
             <p class="section-subtitle">Simple, Secure, and Transparent Process</p>
             
             <div class="steps-container">
-                <div class="step">
+                <!-- Step 1 -->
+                <div class="step-card">
                     <div class="step-icon">
-                        <i class="fas fa-search"></i>
+                        <div class="icon-circle">
+                            <span class="step-number">1</span>
+                        </div>
                     </div>
-                    <h3>1. Browse</h3>
-                    <p>Find your event & select verified tickets from our secure marketplace.</p>
+                    <h3 class="step-title">Browse</h3>
+                    <p class="step-description">Find your event & select verified tickets from our secure marketplace.</p>
                 </div>
                 
-                <div class="step">
+                <!-- Step 2 -->
+                <div class="step-card">
                     <div class="step-icon">
-                        <i class="fas fa-lock"></i>
+                        <div class="icon-circle">
+                            <span class="step-number">2</span>
+                        </div>
                     </div>
-                    <h3>2. Checkout</h3>
-                    <p>Securely pay with buyer protection and instant verification.</p>
+                    <h3 class="step-title">Checkout</h3>
+                    <p class="step-description">Securely pay with buyer protection and instant verification.</p>
                 </div>
                 
-                <div class="step">
+                <!-- Step 3 -->
+                <div class="step-card">
                     <div class="step-icon">
-                        <i class="fas fa-ticket-alt"></i>
+                        <div class="icon-circle">
+                            <span class="step-number">3</span>
+                        </div>
                     </div>
-                    <h3>3. Receive</h3>
-                    <p>Get instant mobile delivery. Your tickets are transferred directly to your account.</p>
+                    <h3 class="step-title">Receive</h3>
+                    <p class="step-description">Get instant mobile delivery. You're in!</p>
                 </div>
             </div>
         </section>
     </main>
 
     <!-- Footer -->
-    <footer class="footer">
-        <div class="footer-content">
-            <div class="footer-section">
-                <div class="footer-logo">
-                    <h3>EventPass Global</h3>
-                    <p>A registered ticket marketplace</p>
+    <footer class="footer" id="support">
+        <div class="footer-container">
+            <div class="footer-grid">
+                <!-- Company Info -->
+                <div class="footer-section">
+                    <div class="footer-logo">
+                        <h3>EventPass Global</h3>
+                        <p class="footer-tagline">A registered ticket marketplace</p>
+                    </div>
+                    
+                    <div class="company-info">
+                        <p class="company-name"><strong>EventPass Global Ltd.</strong></p>
+                        <p class="company-address">
+                            Kemp House, 160 City Road<br>
+                            London, EC1V 2NX
+                        </p>
+                        <p class="company-registration">Company No. 12345678</p>
+                    </div>
                 </div>
-                <div class="company-info">
-                    <p><strong>EventPass Global Ltd.</strong></p>
-                    <p>Kemp House, 160 City Road</p>
-                    <p>London, EC1V 2NX</p>
-                    <p>Company No. 12345678</p>
+                
+                <!-- Legal Links -->
+                <div class="footer-section">
+                    <h4 class="footer-heading">Legal</h4>
+                    <ul class="footer-links">
+                        <li><a href="#" class="footer-link">Terms of Service</a></li>
+                        <li><a href="#" class="footer-link">Privacy Policy</a></li>
+                        <li><a href="#" class="footer-link">GDPR Request</a></li>
+                        <li><a href="#" class="footer-link">Contact Us</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Support -->
+                <div class="footer-section">
+                    <h4 class="footer-heading">Support</h4>
+                    <div class="support-info">
+                        <div class="contact-item">
+                            <span class="contact-icon">📧</span>
+                            <a href="mailto:support@eventpass-global.com" class="contact-link">support@eventpass-global.com</a>
+                        </div>
+                        <div class="contact-item">
+                            <span class="contact-icon">⏱️</span>
+                            <span class="contact-text">Response Time: &lt; 2hrs</span>
+                        </div>
+                    </div>
                 </div>
             </div>
             
-            <div class="footer-section">
-                <h4>Legal</h4>
-                <ul class="footer-links">
-                    <li><a href="#">Terms of Service</a></li>
-                    <li><a href="#">Privacy Policy</a></li>
-                    <li><a href="#">GDPR Request</a></li>
-                    <li><a href="#">Contact Us</a></li>
-                </ul>
+            <div class="footer-bottom">
+                <p>&copy; 2024 EventPass Global Ltd. All rights reserved.</p>
             </div>
-            
-            <div class="footer-section">
-                <h4>Support</h4>
-                <div class="contact-info">
-                    <p><i class="fas fa-envelope"></i> support@eventpass-global.com</p>
-                    <p><i class="fas fa-clock"></i> Response Time: &lt; 2hrs</p>
-                </div>
-            </div>
-        </div>
-        
-        <div class="footer-bottom">
-            <p>&copy; 2024 EventPass Global Ltd. All rights reserved.</p>
         </div>
     </footer>
+
+    <!-- Ticket Selection Modal -->
+    <div class="modal-overlay" id="ticketModal">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3>Confirm Selection</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p id="modalMessage">You have selected <strong>Floor - Row B - Seats 102, 103</strong> for <strong>$489.99 each</strong>.</p>
+                <p class="modal-note">Your tickets will be delivered via mobile entry within 15 minutes of purchase.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary modal-cancel">Cancel</button>
+                <a href="checkout.html" class="btn-primary">Proceed to Checkout</a>
+            </div>
+        </div>
+    </div>
 
     <script src="script.js"></script>
 </body>
