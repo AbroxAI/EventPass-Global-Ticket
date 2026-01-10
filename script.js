@@ -1,299 +1,972 @@
-// Countdown Timer Functionality
-function updateCountdown() {
-    const minutesElement = document.getElementById('minutes');
-    const secondsElement = document.getElementById('seconds');
-    
-    if (!minutesElement || !secondsElement) return;
-    
-    let minutes = parseInt(minutesElement.textContent);
-    let seconds = parseInt(secondsElement.textContent);
-    
-    if (seconds === 0) {
-        if (minutes === 0) {
-            // Reset timer when it reaches 0
-            minutes = 6;
-            seconds = 41;
-        } else {
-            minutes--;
-            seconds = 59;
+// ============================================
+// GLOBAL CONSTANTS AND CONFIGURATION
+// ============================================
+
+const CONFIG = {
+    countdown: {
+        minutes: 6,
+        seconds: 41
+    },
+    holdTimer: {
+        duration: 15 * 60 // 15 minutes in seconds
+    },
+    tickets: {
+        premium: {
+            section: "Floor",
+            row: "B",
+            seats: "102, 103",
+            price: 489.99,
+            type: "Premium Floor Tickets"
+        },
+        standard: {
+            section: "Lower Bowl",
+            row: "M",
+            seats: "45, 46",
+            price: 349.99,
+            type: "Lower Bowl Tickets"
         }
-    } else {
-        seconds--;
+    }
+};
+
+// ============================================
+// UTILITY FUNCTIONS
+// ============================================
+
+function formatTime(seconds) {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+}
+
+function formatCurrency(amount) {
+    return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+        minimumFractionDigits: 2
+    }).format(amount);
+}
+
+function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `notification notification-${type}`;
+    notification.innerHTML = `
+        <div class="notification-content">
+            <span class="notification-icon">${type === 'success' ? '✓' : type === 'error' ? '✗' : 'ℹ'}</span>
+            <span>${message}</span>
+        </div>
+        <button class="notification-close">&times;</button>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Remove after 5 seconds
+    setTimeout(() => {
+        notification.style.opacity = '0';
+        setTimeout(() => notification.remove(), 300);
+    }, 5000);
+    
+    // Close button
+    notification.querySelector('.notification-close').addEventListener('click', () => {
+        notification.remove();
+    });
+}
+
+// ============================================
+// COUNTDOWN TIMER
+// ============================================
+
+class CountdownTimer {
+    constructor(elementId, initialMinutes = 6, initialSeconds = 41) {
+        this.element = document.getElementById(elementId);
+        this.minutesElement = document.getElementById('minutes');
+        this.secondsElement = document.getElementById('seconds');
+        this.minutes = initialMinutes;
+        this.seconds = initialSeconds;
+        this.interval = null;
+        
+        if (this.element) {
+            this.initialize();
+        }
     }
     
-    minutesElement.textContent = minutes.toString().padStart(2, '0');
-    secondsElement.textContent = seconds.toString().padStart(2, '0');
-}
-
-// Initialize countdown timer
-if (document.getElementById('minutes')) {
-    setInterval(updateCountdown, 1000);
-}
-
-// Testimonial Carousel
-document.addEventListener('DOMContentLoaded', function() {
-    const carouselTrack = document.querySelector('.carousel-track');
-    if (!carouselTrack) return;
-    
-    // Clone testimonials for seamless looping
-    const testimonials = carouselTrack.querySelectorAll('.testimonial');
-    testimonials.forEach(testimonial => {
-        const clone = testimonial.cloneNode(true);
-        carouselTrack.appendChild(clone);
-    });
-    
-    // Pause animation on hover
-    carouselTrack.addEventListener('mouseenter', () => {
-        carouselTrack.style.animationPlayState = 'paused';
-    });
-    
-    carouselTrack.addEventListener('mouseleave', () => {
-        carouselTrack.style.animationPlayState = 'running';
-    });
-});
-
-// Checkout Page Payment Flow
-document.addEventListener('DOMContentLoaded', function() {
-    const continueButton = document.getElementById('continue-payment');
-    const paymentForm = document.getElementById('payment-form');
-    const verificationStep = document.getElementById('verification-step');
-    
-    if (!continueButton || !verificationStep) return;
-    
-    continueButton.addEventListener('click', function(e) {
-        e.preventDefault();
+    initialize() {
+        this.updateDisplay();
+        this.start();
         
-        // Simple form validation
+        // Add subtle animation to colon
+        const colon = this.element.querySelector('.colon');
+        if (colon) {
+            setInterval(() => {
+                colon.style.opacity = colon.style.opacity === '0.5' ? '1' : '0.5';
+            }, 500);
+        }
+    }
+    
+    start() {
+        this.interval = setInterval(() => {
+            this.tick();
+        }, 1000);
+    }
+    
+    tick() {
+        if (this.seconds === 0) {
+            if (this.minutes === 0) {
+                this.reset();
+                return;
+            }
+            this.minutes--;
+            this.seconds = 59;
+        } else {
+            this.seconds--;
+        }
+        this.updateDisplay();
+    }
+    
+    updateDisplay() {
+        if (this.minutesElement && this.secondsElement) {
+            this.minutesElement.textContent = this.minutes.toString().padStart(2, '0');
+            this.secondsElement.textContent = this.seconds.toString().padStart(2, '0');
+        }
+    }
+    
+    reset() {
+        this.minutes = CONFIG.countdown.minutes;
+        this.seconds = CONFIG.countdown.seconds;
+        this.updateDisplay();
+        showNotification('Timer reset - tickets still available!', 'info');
+    }
+    
+    stop() {
+        if (this.interval) {
+            clearInterval(this.interval);
+        }
+    }
+}
+
+// ============================================
+// TESTIMONIAL CAROUSEL
+// ============================================
+
+class TestimonialCarousel {
+    constructor(containerId) {
+        this.container = document.getElementById(containerId);
+        this.track = this.container ? this.container.querySelector('.carousel-track') : null;
+        this.testimonials = this.track ? Array.from(this.track.children) : [];
+        this.speed = 40; // seconds for full scroll
+        this.isPaused = false;
+        
+        if (this.track && this.testimonials.length > 0) {
+            this.initialize();
+        }
+    }
+    
+    initialize() {
+        // Duplicate testimonials for seamless looping
+        const duplicates = this.testimonials.map(testimonial => testimonial.cloneNode(true));
+        duplicates.forEach(duplicate => this.track.appendChild(duplicate));
+        
+        // Pause on hover
+        this.container.addEventListener('mouseenter', () => this.pause());
+        this.container.addEventListener('mouseleave', () => this.resume());
+        
+        // Touch events for mobile
+        let startX = 0;
+        let scrollLeft = 0;
+        
+        this.track.addEventListener('touchstart', (e) => {
+            startX = e.touches[0].pageX;
+            scrollLeft = this.track.scrollLeft;
+            this.pause();
+        });
+        
+        this.track.addEventListener('touchend', () => {
+            setTimeout(() => this.resume(), 2000);
+        });
+    }
+    
+    pause() {
+        this.track.style.animationPlayState = 'paused';
+        this.isPaused = true;
+    }
+    
+    resume() {
+        this.track.style.animationPlayState = 'running';
+        this.isPaused = false;
+    }
+}
+
+// ============================================
+// TICKET SELECTION
+// ============================================
+
+class TicketSelection {
+    constructor() {
+        this.modal = document.getElementById('ticketModal');
+        this.selectedTicket = null;
+        this.initialize();
+    }
+    
+    initialize() {
+        // Select ticket buttons
+        document.querySelectorAll('.select-btn').forEach(button => {
+            button.addEventListener('click', (e) => {
+                e.preventDefault();
+                const ticketType = button.getAttribute('data-ticket');
+                this.selectTicket(ticketType);
+            });
+        });
+        
+        // Modal close buttons
+        if (this.modal) {
+            this.modal.querySelectorAll('.modal-close, .modal-cancel').forEach(button => {
+                button.addEventListener('click', () => this.closeModal());
+            });
+            
+            // Close on overlay click
+            this.modal.addEventListener('click', (e) => {
+                if (e.target === this.modal) {
+                    this.closeModal();
+                }
+            });
+            
+            // Escape key to close
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && this.modal.style.display === 'block') {
+                    this.closeModal();
+                }
+            });
+        }
+    }
+    
+    selectTicket(ticketType) {
+        const ticket = CONFIG.tickets[ticketType];
+        if (!ticket) return;
+        
+        this.selectedTicket = ticket;
+        
+        // Store in session storage for checkout
+        sessionStorage.setItem('selectedTicket', JSON.stringify({
+            type: ticketType,
+            ...ticket
+        }));
+        
+        // Show modal
+        if (this.modal) {
+            const modalMessage = this.modal.querySelector('#modalMessage');
+            if (modalMessage) {
+                modalMessage.innerHTML = `
+                    You have selected <strong>${ticket.section} - Row ${ticket.row} - Seats ${ticket.seats}</strong> 
+                    for <strong>${formatCurrency(ticket.price)} each</strong>.
+                `;
+            }
+            
+            // Update checkout link
+            const checkoutLink = this.modal.querySelector('a[href="checkout.html"]');
+            if (checkoutLink) {
+                checkoutLink.href = `checkout.html?ticket=${ticketType}`;
+            }
+            
+            this.showModal();
+        } else {
+            // If no modal, go directly to checkout
+            window.location.href = `checkout.html?ticket=${ticketType}`;
+        }
+    }
+    
+    showModal() {
+        if (this.modal) {
+            this.modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+    }
+    
+    closeModal() {
+        if (this.modal) {
+            this.modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+    }
+}
+
+// ============================================
+// CHECKOUT PAYMENT FLOW
+// ============================================
+
+class CheckoutPayment {
+    constructor() {
+        this.paymentForm = document.getElementById('paymentForm');
+        this.verificationStep = document.getElementById('verificationStep');
+        this.successStep = document.getElementById('successStep');
+        this.holdTimer = document.getElementById('holdTimer');
+        this.holdTimeDisplay = document.getElementById('holdTime');
+        this.transferModal = document.getElementById('transferModal');
+        this.holdTimerInterval = null;
+        this.timeLeft = CONFIG.holdTimer.duration;
+        this.initialize();
+    }
+    
+    initialize() {
+        // Continue to payment button
+        const continueBtn = document.getElementById('continueBtn');
+        if (continueBtn) {
+            continueBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.validateAndProceed();
+            });
+        }
+        
+        // Instant bank transfer button
+        const instantTransferBtn = document.getElementById('instantTransferBtn');
+        if (instantTransferBtn) {
+            instantTransferBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.processBankTransfer();
+            });
+        }
+        
+        // Manual transfer link
+        const manualTransferLink = document.getElementById('manualTransferLink');
+        if (manualTransferLink) {
+            manualTransferLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.showTransferInstructions();
+            });
+        }
+        
+        // Copy bank details button
+        const copyDetailsBtn = document.getElementById('copyDetailsBtn');
+        if (copyDetailsBtn) {
+            copyDetailsBtn.addEventListener('click', () => this.copyBankDetails());
+        }
+        
+        // Print receipt button
+        const printReceiptBtn = document.querySelector('.print-receipt-btn');
+        if (printReceiptBtn) {
+            printReceiptBtn.addEventListener('click', () => window.print());
+        }
+        
+        // Transfer modal close
+        if (this.transferModal) {
+            this.transferModal.querySelectorAll('.modal-close, .modal-cancel').forEach(button => {
+                button.addEventListener('click', () => this.closeTransferModal());
+            });
+            
+            this.transferModal.addEventListener('click', (e) => {
+                if (e.target === this.transferModal) {
+                    this.closeTransferModal();
+                }
+            });
+        }
+        
+        // Load selected ticket from session storage
+        this.loadSelectedTicket();
+    }
+    
+    validateAndProceed() {
         const email = document.getElementById('email');
         const name = document.getElementById('name');
         
+        // Basic validation
         if (!email.value || !name.value) {
-            alert('Please fill in all required fields');
+            showNotification('Please fill in all required fields', 'error');
             return;
         }
         
-        if (!isValidEmail(email.value)) {
-            alert('Please enter a valid email address');
+        if (!this.isValidEmail(email.value)) {
+            showNotification('Please enter a valid email address', 'error');
             email.focus();
             return;
         }
         
         // Show loading state
-        continueButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
-        continueButton.disabled = true;
-        
-        // Simulate API call delay
-        setTimeout(() => {
-            paymentForm.style.display = 'none';
-            verificationStep.classList.remove('hidden');
+        const continueBtn = document.getElementById('continueBtn');
+        if (continueBtn) {
+            const originalText = continueBtn.innerHTML;
+            continueBtn.innerHTML = `
+                <span class="btn-spinner"></span>
+                Processing...
+            `;
+            continueBtn.disabled = true;
+            
+            // Simulate API call delay
+            setTimeout(() => {
+                this.showVerificationStep();
+                continueBtn.innerHTML = originalText;
+                continueBtn.disabled = false;
+            }, 1500);
+        }
+    }
+    
+    isValidEmail(email) {
+        const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return re.test(email);
+    }
+    
+    showVerificationStep() {
+        if (this.paymentForm && this.verificationStep) {
+            this.paymentForm.style.display = 'none';
+            this.verificationStep.style.display = 'block';
             
             // Start hold timer
-            startHoldTimer();
+            this.startHoldTimer();
             
             // Scroll to verification
-            verificationStep.scrollIntoView({ behavior: 'smooth' });
-        }, 1500);
-    });
+            this.verificationStep.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            
+            showNotification('Tickets placed on hold for 15 minutes', 'info');
+        }
+    }
     
-    // Bank transfer button
-    const bankTransferBtn = document.querySelector('.bank-transfer-button');
-    if (bankTransferBtn) {
-        bankTransferBtn.addEventListener('click', function(e) {
-            e.preventDefault();
+    startHoldTimer() {
+        if (this.holdTimer && this.holdTimeDisplay) {
+            this.holdTimer.style.display = 'block';
+            this.timeLeft = CONFIG.holdTimer.duration;
             
-            // Simulate payment processing
-            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing Payment...';
-            this.disabled = true;
-            
-            setTimeout(() => {
-                // Show success message
-                const verificationMessage = document.querySelector('.verification-message');
-                if (verificationMessage) {
-                    verificationMessage.innerHTML = `
-                        <div class="verification-icon">
-                            <i class="fas fa-check-circle" style="color: #10B981;"></i>
-                        </div>
-                        <h3>Payment Successful!</h3>
-                        <div class="verification-text">
-                            <p>Your tickets have been secured and will be delivered to your email within 15 minutes.</p>
-                            <p class="highlight">
-                                <i class="fas fa-check"></i> Order confirmed: #EPG${Date.now().toString().slice(-8)}
-                            </p>
-                        </div>
-                    `;
-                    
-                    // Update payment options
-                    const paymentOptions = document.querySelector('.payment-options');
-                    if (paymentOptions) {
-                        paymentOptions.innerHTML = `
-                            <div class="payment-option" style="border-color: #10B981; background: rgba(16, 185, 129, 0.05);">
-                                <div class="option-header">
-                                    <i class="fas fa-check-circle" style="color: #10B981;"></i>
-                                    <div>
-                                        <h4>Payment Completed</h4>
-                                        <p>You will receive your tickets shortly</p>
-                                    </div>
-                                </div>
-                                <a href="#" class="manual-transfer-link" onclick="window.print()">
-                                    <i class="fas fa-print"></i> Print Receipt
-                                </a>
-                            </div>
-                        `;
+            this.holdTimerInterval = setInterval(() => {
+                this.timeLeft--;
+                this.holdTimeDisplay.textContent = formatTime(this.timeLeft);
+                
+                // Update timer color based on time left
+                if (this.timeLeft <= 60) { // 1 minute left
+                    this.holdTimer.style.background = 'linear-gradient(135deg, #F59E0B, #D97706)';
+                }
+                
+                if (this.timeLeft <= 0) {
+                    this.clearHoldTimer();
+                    showNotification('Hold expired. Please restart your purchase.', 'error');
+                    // Reset to payment form
+                    if (this.paymentForm && this.verificationStep) {
+                        this.verificationStep.style.display = 'none';
+                        this.paymentForm.style.display = 'block';
                     }
                 }
-            }, 2000);
+            }, 1000);
+        }
+    }
+    
+    clearHoldTimer() {
+        if (this.holdTimerInterval) {
+            clearInterval(this.holdTimerInterval);
+            this.holdTimerInterval = null;
+        }
+        if (this.holdTimer) {
+            this.holdTimer.style.display = 'none';
+        }
+    }
+    
+    processBankTransfer() {
+        const instantTransferBtn = document.getElementById('instantTransferBtn');
+        if (instantTransferBtn) {
+            const originalText = instantTransferBtn.innerHTML;
+            instantTransferBtn.innerHTML = `
+                <span class="btn-spinner"></span>
+                Processing Payment...
+            `;
+            instantTransferBtn.disabled = true;
+            
+            // Simulate payment processing
+            setTimeout(() => {
+                this.showSuccessStep();
+                this.clearHoldTimer();
+                instantTransferBtn.innerHTML = originalText;
+                instantTransferBtn.disabled = false;
+                
+                // Generate confirmation number
+                const confirmationNumber = `EPG-${new Date().getFullYear()}-${Math.floor(Math.random() * 10000)}`;
+                const confirmationElement = document.querySelector('.confirmation-number');
+                if (confirmationElement) {
+                    confirmationElement.textContent = confirmationNumber;
+                }
+            }, 3000);
+        }
+    }
+    
+    showSuccessStep() {
+        if (this.verificationStep && this.successStep) {
+            this.verificationStep.style.display = 'none';
+            this.successStep.style.display = 'block';
+            
+            // Send confirmation email (simulated)
+            setTimeout(() => {
+                showNotification('Confirmation email sent to your inbox', 'success');
+            }, 1000);
+        }
+    }
+    
+    showTransferInstructions() {
+        if (this.transferModal) {
+            this.transferModal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+    }
+    
+    closeTransferModal() {
+        if (this.transferModal) {
+            this.transferModal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+    }
+    
+    copyBankDetails() {
+        const bankDetails = `
+Bank Name: Barclays Bank PLC
+Account Name: EventPass Global Ltd.
+Sort Code: 20-00-00
+Account Number: 12345678
+Reference: EPG-2024-8472
+Amount: $1,039.96
+        `.trim();
+        
+        navigator.clipboard.writeText(bankDetails).then(() => {
+            showNotification('Bank details copied to clipboard', 'success');
+        }).catch(() => {
+            // Fallback for older browsers
+            const textArea = document.createElement('textarea');
+            textArea.value = bankDetails;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            showNotification('Bank details copied to clipboard', 'success');
         });
     }
-});
-
-// Email validation
-function isValidEmail(email) {
-    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return re.test(email);
-}
-
-// Hold timer for checkout
-function startHoldTimer() {
-    const timerElement = document.querySelector('.highlight');
-    if (!timerElement) return;
     
-    let timeLeft = 15 * 60; // 15 minutes in seconds
-    
-    const timerInterval = setInterval(() => {
-        timeLeft--;
-        
-        const minutes = Math.floor(timeLeft / 60);
-        const seconds = timeLeft % 60;
-        
-        timerElement.innerHTML = `
-            <i class="fas fa-clock"></i> Your tickets are on hold for 
-            <strong>${minutes}:${seconds.toString().padStart(2, '0')}</strong>
-        `;
-        
-        if (timeLeft <= 0) {
-            clearInterval(timerInterval);
-            timerElement.innerHTML = `
-                <i class="fas fa-exclamation-triangle"></i> 
-                <strong>Hold expired. Please restart your purchase.</strong>
-            `;
-            timerElement.style.color = '#EF4444';
-        }
-    }, 1000);
-}
-
-// Smooth scrolling for anchor links
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function (e) {
-        e.preventDefault();
-        
-        const targetId = this.getAttribute('href');
-        if (targetId === '#') return;
-        
-        const targetElement = document.querySelector(targetId);
-        if (targetElement) {
-            targetElement.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
-            });
-        }
-    });
-});
-
-// Ticket selection animation
-document.querySelectorAll('.select-button').forEach(button => {
-    button.addEventListener('click', function(e) {
-        // Add click animation
-        this.style.transform = 'scale(0.95)';
-        setTimeout(() => {
-            this.style.transform = '';
-        }, 150);
-        
-        // Store selected ticket in session storage
-        const ticketCard = this.closest('.ticket-card');
-        if (ticketCard) {
-            const ticketData = {
-                section: ticketCard.querySelector('.seat-section').textContent,
-                row: ticketCard.querySelector('.seat-row strong').textContent,
-                seats: ticketCard.querySelector('.seat-numbers strong').textContent,
-                price: ticketCard.querySelector('.price').textContent.split(' ')[0]
-            };
-            
-            sessionStorage.setItem('selectedTicket', JSON.stringify(ticketData));
-        }
-    });
-});
-
-// Initialize ticket data on checkout page
-document.addEventListener('DOMContentLoaded', function() {
-    if (window.location.pathname.includes('checkout.html')) {
+    loadSelectedTicket() {
         const storedTicket = sessionStorage.getItem('selectedTicket');
         if (storedTicket) {
-            const ticketData = JSON.parse(storedTicket);
-            
-            // Update ticket summary if elements exist
-            const ticketInfo = document.querySelector('.ticket-info h4');
-            if (ticketInfo) {
-                ticketInfo.textContent = `${ticketData.section} Tickets (x2)`;
-            }
-            
-            const seatInfo = document.querySelector('.ticket-info p');
-            if (seatInfo) {
-                seatInfo.textContent = `Section: ${ticketData.section} • Row: ${ticketData.row} • Seats: ${ticketData.seats}`;
-            }
-            
-            const ticketPrice = document.querySelector('.ticket-price');
-            if (ticketPrice && ticketData.price) {
-                const price = parseFloat(ticketData.price.replace('$', '')) * 2;
-                ticketPrice.textContent = `$${price.toFixed(2)}`;
+            try {
+                const ticket = JSON.parse(storedTicket);
                 
-                // Update total
-                const subtotal = document.querySelectorAll('.price-row')[0];
-                if (subtotal) {
-                    subtotal.children[1].textContent = `$${price.toFixed(2)}`;
+                // Update ticket summary if elements exist
+                const ticketInfo = document.querySelector('.ticket-info h4');
+                const seatDetails = document.querySelector('.seat-details');
+                const ticketPrice = document.querySelector('.ticket-price');
+                
+                if (ticketInfo) {
+                    ticketInfo.innerHTML = `${ticket.type} <span class="ticket-quantity">(x2)</span>`;
                 }
                 
-                const total = document.querySelector('.price-row.total span:last-child');
-                if (total) {
-                    const totalAmount = price + 49.99 + 9.99;
-                    total.textContent = `$${totalAmount.toFixed(2)}`;
+                if (seatDetails) {
+                    seatDetails.innerHTML = `
+                        <span class="seat-item">Section: ${ticket.section}</span>
+                        <span class="seat-item">Row: ${ticket.row}</span>
+                        <span class="seat-item">Seats: ${ticket.seats}</span>
+                    `;
                 }
+                
+                if (ticketPrice && ticket.price) {
+                    const totalPrice = ticket.price * 2;
+                    ticketPrice.textContent = formatCurrency(totalPrice);
+                    
+                    // Update price breakdown
+                    this.updatePriceBreakdown(totalPrice);
+                }
+            } catch (e) {
+                console.error('Error loading ticket:', e);
             }
         }
     }
-});
-
-// Mobile menu toggle (for future mobile optimization)
-function initMobileMenu() {
-    const navbar = document.querySelector('.navbar');
-    if (!navbar) return;
     
-    // Create mobile menu button
-    const mobileMenuBtn = document.createElement('button');
-    mobileMenuBtn.className = 'mobile-menu-btn';
-    mobileMenuBtn.innerHTML = '<i class="fas fa-bars"></i>';
-    
-    const navMenu = document.querySelector('.nav-menu');
-    if (navMenu) {
-        navbar.insertBefore(mobileMenuBtn, navMenu);
+    updatePriceBreakdown(subtotal) {
+        const serviceFee = 49.99;
+        const processingFee = 9.99;
+        const total = subtotal + serviceFee + processingFee;
         
-        mobileMenuBtn.addEventListener('click', function() {
-            navMenu.classList.toggle('show');
+        // Update subtotal
+        const subtotalElement = document.querySelector('.price-row:nth-child(1) .price-value');
+        if (subtotalElement) {
+            subtotalElement.textContent = formatCurrency(subtotal);
+        }
+        
+        // Update total
+        const totalElement = document.querySelector('.price-row.total .price-value');
+        if (totalElement) {
+            totalElement.textContent = formatCurrency(total);
+        }
+    }
+}
+
+// ============================================
+// NAVIGATION
+// ============================================
+
+class Navigation {
+    constructor() {
+        this.initialize();
+    }
+    
+    initialize() {
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', (e) => {
+                const href = anchor.getAttribute('href');
+                if (href === '#') return;
+                
+                const targetElement = document.querySelector(href);
+                if (targetElement) {
+                    e.preventDefault();
+                    targetElement.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                    
+                    // Update URL without page jump
+                    history.pushState(null, null, href);
+                }
+            });
+        });
+        
+        // Set active navigation item based on scroll position
+        window.addEventListener('scroll', () => {
+            const sections = document.querySelectorAll('section[id]');
+            const scrollPos = window.scrollY + 100;
+            
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                const sectionId = section.getAttribute('id');
+                
+                if (scrollPos >= sectionTop && scrollPos < sectionTop + sectionHeight) {
+                    this.setActiveNavItem(sectionId);
+                }
+            });
+        });
+        
+        // Mobile menu toggle (for future enhancement)
+        this.initMobileMenu();
+    }
+    
+    setActiveNavItem(sectionId) {
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.classList.remove('active');
+            if (link.getAttribute('href') === `#${sectionId}`) {
+                link.classList.add('active');
+            }
+        });
+    }
+    
+    initMobileMenu() {
+        const navbar = document.querySelector('.navbar');
+        if (!navbar || window.innerWidth > 768) return;
+        
+        // Create mobile menu button
+        const menuButton = document.createElement('button');
+        menuButton.className = 'mobile-menu-button';
+        menuButton.innerHTML = '☰';
+        menuButton.setAttribute('aria-label', 'Toggle menu');
+        
+        const navMenu = document.querySelector('.nav-menu');
+        if (navMenu) {
+            navbar.insertBefore(menuButton, navMenu);
+            
+            menuButton.addEventListener('click', () => {
+                navMenu.classList.toggle('show');
+                menuButton.textContent = navMenu.classList.contains('show') ? '✕' : '☰';
+            });
+            
+            // Close menu when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!navMenu.contains(e.target) && !menuButton.contains(e.target)) {
+                    navMenu.classList.remove('show');
+                    menuButton.textContent = '☰';
+                }
+            });
+        }
+    }
+}
+
+// ============================================
+// ANALYTICS AND TRACKING (Simulated)
+// ============================================
+
+class Analytics {
+    static trackEvent(eventName, data = {}) {
+        // In a real implementation, this would send to Google Analytics, etc.
+        console.log(`[Analytics] ${eventName}:`, data);
+        
+        // Simulate tracking
+        const events = JSON.parse(localStorage.getItem('eventpass_events') || '[]');
+        events.push({
+            event: eventName,
+            data: data,
+            timestamp: new Date().toISOString(),
+            page: window.location.pathname
+        });
+        localStorage.setItem('eventpass_events', JSON.stringify(events.slice(-100))); // Keep last 100 events
+    }
+    
+    static trackPageView() {
+        this.trackEvent('page_view', {
+            url: window.location.href,
+            referrer: document.referrer,
+            title: document.title
         });
     }
 }
 
-// Initialize on load
-window.addEventListener('load', function() {
-    initMobileMenu();
+// ============================================
+// PERFORMANCE OPTIMIZATION
+// ============================================
+
+class PerformanceOptimizer {
+    constructor() {
+        this.initialize();
+    }
     
-    // Add active class to current page in navigation
-    const currentPage = window.location.pathname.split('/').pop();
-    document.querySelectorAll('.nav-link').forEach(link => {
-        const linkPage = link.getAttribute('href');
-        if (linkPage === currentPage || 
-            (currentPage === '' && linkPage === 'index.html') ||
-            (currentPage === 'index.html' && linkPage === '#')) {
-            link.classList.add('active');
+    initialize() {
+        // Lazy load images
+        this.lazyLoadImages();
+        
+        // Debounce scroll events
+        this.optimizeScrollEvents();
+        
+        // Preload critical resources
+        this.preloadResources();
+    }
+    
+    lazyLoadImages() {
+        const images = document.querySelectorAll('img[data-src]');
+        if ('IntersectionObserver' in window) {
+            const imageObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const img = entry.target;
+                        img.src = img.dataset.src;
+                        img.removeAttribute('data-src');
+                        imageObserver.unobserve(img);
+                    }
+                });
+            });
+            
+            images.forEach(img => imageObserver.observe(img));
+        } else {
+            // Fallback for older browsers
+            images.forEach(img => {
+                img.src = img.dataset.src;
+                img.removeAttribute('data-src');
+            });
         }
+    }
+    
+    optimizeScrollEvents() {
+        let scrollTimeout;
+        window.addEventListener('scroll', () => {
+            clearTimeout(scrollTimeout);
+            scrollTimeout = setTimeout(() => {
+                // Handle scroll-based operations here
+            }, 100);
+        });
+    }
+    
+    preloadResources() {
+        // Preload critical resources
+        const links = [
+            { rel: 'preload', href: 'style.css', as: 'style' },
+            { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
+            { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: true }
+        ];
+        
+        links.forEach(link => {
+            const el = document.createElement('link');
+            Object.assign(el, link);
+            document.head.appendChild(el);
+        });
+    }
+}
+
+// ============================================
+// INITIALIZATION
+// ============================================
+
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('EventPass Global - Initializing...');
+    
+    // Initialize analytics
+    Analytics.trackPageView();
+    
+    // Initialize performance optimizer
+    new PerformanceOptimizer();
+    
+    // Initialize navigation
+    new Navigation();
+    
+    // Initialize countdown timer (home page only)
+    if (document.getElementById('countdownTimer')) {
+        window.countdownTimer = new CountdownTimer('countdownTimer');
+        Analytics.trackEvent('timer_initialized');
+    }
+    
+    // Initialize testimonial carousel (home page only)
+    if (document.getElementById('testimonialCarousel')) {
+        window.testimonialCarousel = new TestimonialCarousel('testimonialCarousel');
+        Analytics.trackEvent('carousel_initialized');
+    }
+    
+    // Initialize ticket selection (home page only)
+    if (document.querySelector('.select-btn')) {
+        window.ticketSelection = new TicketSelection();
+        Analytics.trackEvent('ticket_selection_initialized');
+    }
+    
+    // Initialize checkout payment flow (checkout page only)
+    if (document.getElementById('paymentForm')) {
+        window.checkoutPayment = new CheckoutPayment();
+        Analytics.trackEvent('checkout_initialized');
+    }
+    
+    // Add CSS for notifications
+    const notificationStyles = `
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--primary-color);
+            color: var(--secondary-color);
+            padding: 1rem 1.5rem;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-lg);
+            z-index: 3000;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transform: translateX(0);
+            transition: all 0.3s ease;
+            max-width: 400px;
+        }
+        
+        .notification.notification-success {
+            background: var(--accent-teal);
+        }
+        
+        .notification.notification-error {
+            background: #EF4444;
+        }
+        
+        .notification-content {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            flex: 1;
+        }
+        
+        .notification-icon {
+            font-size: 1.25rem;
+            font-weight: bold;
+        }
+        
+        .notification-close {
+            background: none;
+            border: none;
+            color: inherit;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0;
+            line-height: 1;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+        
+        .notification-close:hover {
+            opacity: 1;
+        }
+        
+        .btn-spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: var(--secondary-color);
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        .mobile-menu-button {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            color: var(--primary-color);
+        }
+        
+        @media (max-width: 768px) {
+            .mobile-menu-button {
+                display: block;
+            }
+            
+            .nav-menu {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: var(--secondary-color);
+                flex-direction: column;
+                padding: 1rem;
+                box-shadow: var(--shadow-lg);
+                z-index: 1000;
+            }
+            
+            .nav-menu.show {
+                display: flex;
+            }
+        }
+    `;
+    
+    const styleSheet = document.createElement('style');
+    styleSheet.textContent = notificationStyles;
+    document.head.appendChild(styleSheet);
+    
+    console.log('EventPass Global - Initialization complete');
+});
+
+// ============================================
+// GLOBAL ERROR HANDLING
+// ============================================
+
+window.addEventListener('error', (event) => {
+    console.error('Global error:', event.error);
+    Analytics.trackEvent('error', {
+        message: event.message,
+        filename: event.filename,
+        lineno: event.lineno,
+        colno: event.colno
     });
 });
+
+window.addEventListener('unhandledrejection', (event) => {
+    console.error('Unhandled promise rejection:', event.reason);
+    Analytics.trackEvent('promise_rejection', {
+        reason: event.reason?.toString()
+    });
+});
+
+// ============================================
+// SERVICE WORKER (PWA SUPPORT - OPTIONAL)
+// ============================================
+
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').catch(error => {
+            console.log('ServiceWorker registration failed:', error);
+        });
+    });
+}
+
+// ============================================
+// EXPORTS FOR TESTING (if needed)
+// ============================================
+
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+        CountdownTimer,
+        TestimonialCarousel,
+        TicketSelection,
+        CheckoutPayment,
+        Navigation,
+        Analytics,
+        formatTime,
+        formatCurrency
+    };
+}
